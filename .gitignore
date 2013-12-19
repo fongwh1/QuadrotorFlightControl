@@ -1,0 +1,7 @@
+.tags*
+*.o
+*.bin
+*.elf
+*.out
+.*.swp
+.*.*.swp
