@@ -42,7 +42,6 @@ void read_string(char *command){
 	int curr_char = 0;
 	int curr_len = 0;
 	char done = 0;
-	char esc_or_not = 0;
 
 	do{
 		ch[0] = non_block_receive_byte();
@@ -69,9 +68,9 @@ void read_string(char *command){
 					curr_char--;
 					printf("\b");
 				}
-			continue;
-		}
-		}else{
+				continue;
+			}
+		}else if(ch[0] != '\0'){
 			command[curr_char++] = ch[0];
 			curr_len++;
 			printf("%c", ch[0]);
@@ -100,9 +99,9 @@ void user_shell(){
 	while(1){
 		printf("evshary->");
 		read_string(command);
-		argv[argc++] = strtok(command, ' ');
+		argv[argc++] = (char *)strtok(command, ' ');
 		while(1){
-			argv[argc] = strtok(NULL, ' ');
+			argv[argc] = (char *)strtok(NULL, ' ');
 			if(argv[argc] == NULL)break;
 			argc++;
 		}

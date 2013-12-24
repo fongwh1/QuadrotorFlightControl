@@ -4,28 +4,7 @@
 #include "stm32f4_usart.h"
 #include "module_rs232.h"
 #include "misc.h"
-/*=====================================================================================================*/
-/*==================================================================
-**Name:		enable_rs232_interrupts
-**Function:	
-**Input:	
-**Output:	
-**Usage:	
-==================================================================*/
-void enable_rs232_interrupts(void){
-	NVIC_InitTypeDef NVIC_InitStructure;
-	
-	/*Enable transmit and receive interrupts for the USART3*/
-	USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
-	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-
-	/*Enable the USART3 IRQ in the NVIC module
-	 *(so that the USART3 interrupt handler is enabled)*/
-	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-}
+#include "usartIO.h"
 /*=====================================================================================================*
 **函數 : RS232_Config
 **功能 : 
