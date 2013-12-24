@@ -63,7 +63,7 @@ void RS232_Config( void )
   USART_Cmd(USART3, ENABLE);
 
   USART_ClearFlag(USART1, USART_FLAG_TC);
-  //enable_rs232_interrupts();
+  enable_rs232_interrupts();
 }
 
 void sendch(uc8 *pWord){
