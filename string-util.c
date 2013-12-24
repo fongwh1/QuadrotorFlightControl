@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include <stdarg.h>
+#include "usartIO.h"
 
 #define ALIGN (sizeof(size_t))
 #define ONES ((size_t)-1/UCHAR_MAX)                                                                      
@@ -132,14 +133,14 @@ char *strtok(char *split_str, const char delim){
 }
 
 void print(char *print_str){
-	sendstr(print_str);
+	send_str(print_str);
 	/*
 	fio_write(1, print_str, strlen(print_str));
 	*/
 	if(print_str[strlen(print_str)-1] == '\n')
 	{
 		//fio_write(1, "\r", 1);
-		sendstr("\r");
+		send_str("\r");
 	}
 }
 
