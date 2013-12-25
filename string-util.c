@@ -59,16 +59,16 @@ char *strchr(const char *s, int c)
 
 char *strcpy(char *dest, const char *src)
 {
-	const unsigned char *s = src;
-	unsigned char *d = dest;
+	const unsigned char *s = (unsigned char *)src;
+	unsigned char *d = (unsigned char *)dest;
 	while ((*d++ = *s++));
 	return dest;
 }
 
 char *strncpy(char *dest, const char *src, size_t n)
 {
-	const unsigned char *s = src;
-	unsigned char *d = dest;
+	const unsigned char *s = (unsigned char *)src;
+	unsigned char *d = (unsigned char *)dest;
 	while (n-- && (*d++ = *s++));
 	return dest;
 }
@@ -111,7 +111,6 @@ char *strtok(char *split_str, const char delim){
 	static char *current_ptr;
 	static char end_flag;
 	char *current_token;
-	int i;
 	if(split_str == NULL){
 		if(end_flag == 1)return NULL;
 		current_ptr++;
@@ -186,7 +185,6 @@ int num_to_string(unsigned int num, char*num_str, int base, int sign_or_not){
 
 static int common_printf(char *dest, const char *format, va_list param){
 	char *pstr = dest;
-	int ptr;
 	while(*format != '\0'){
 		if(*format == '%'){
 			format++;
@@ -204,16 +202,6 @@ static int common_printf(char *dest, const char *format, va_list param){
 				case 's':
 					strcpy(pstr, va_arg(param, char*));
 					pstr += strlen(pstr);
-					break;
-				case 'p':
-					ptr = va_arg(param, int);
-					if(ptr == NULL){
-						strcpy(pstr, "<nil>");
-						pstr += strlen(pstr);
-					}else{
-						num_to_string(ptr, pstr, 16, 1);
-						pstr += strlen(pstr);
-					}
 					break;
 				case 'X':
 				case 'x':
