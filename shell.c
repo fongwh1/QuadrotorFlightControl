@@ -46,34 +46,63 @@ void read_string(char *command){
 	do{
 		ch[0] = non_block_receive_byte();
 		if(curr_char >= MAX_COMMAND_LEN || (ch[0] == '\r') || (ch[0] == '\n')){
-			command[curr_char] = '\0';
+			command[curr_len] = '\0';
 			printf("\n");
 			done = 1;
 		}else if(ch[0] == BACKSPACE){
 			if(curr_char > 0){
+				int i;
 				curr_char--;
+				for(i = curr_char; i < curr_len; i++){
+					command[i] = command[i+1];
+				}
 				curr_len--;
-				printf("\b \b");
+				command[curr_len] = '\0';
+				printf("\b%s \b", command+curr_char);
+				i = curr_len - curr_char;
+				while(i){
+					printf("\b");
+					i--;
+				}
 			}
 		}else if(ch[0] == ESC){
 			ch[0] = non_block_receive_byte();
 			if(ch[0] == '['){
 				ch[0] = non_block_receive_byte();
 				if(ch[0] == 'C'){
-				if(curr_len > curr_char){
-					printf("%c",command[curr_char]);
-					curr_char++;
-				}
+					if(curr_len > curr_char){
+						printf("%c",command[curr_char]);
+						curr_char++;
+					}
 				}else if(ch[0] == 'D'){
-					curr_char--;
-					printf("\b");
+					if(curr_char > 0){
+						curr_char--;
+						printf("\b");
+					}
 				}
 				continue;
 			}
 		}else if(ch[0] != '\0'){
-			command[curr_char++] = ch[0];
-			curr_len++;
-			printf("%c", ch[0]);
+			if(curr_char < curr_len){
+				int i;
+				for(i = curr_len; i > curr_char; i--){
+					command[i] = command[i-1];
+				}
+				curr_len++;
+				command[curr_len] = '\0';
+				command[curr_char] =ch[0];
+				printf("%s", command+curr_char);
+				curr_char++;
+				i = curr_len - curr_char;
+				while(i){
+					printf("\b");
+					i--;
+				}
+			}else{
+				command[curr_char++] = ch[0];
+				curr_len++;
+				printf("%c", ch[0]);
+			}
 		}
 	}while(!done);
 
