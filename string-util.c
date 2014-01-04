@@ -203,6 +203,8 @@ static int common_printf(char *dest, const char *format, va_list param){
 					strcpy(pstr, va_arg(param, char*));
 					pstr += strlen(pstr);
 					break;
+				case 'f':
+				case 'F':
 				case 'X':
 				case 'x':
 					num_to_string(va_arg(param, int), pstr, 16, 1);

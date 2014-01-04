@@ -1,4 +1,5 @@
 #include "string-util.h"
+#include "module/module_nrf24l01.h"
 
 #define MAX_COMMAND_LEN 30
 #define BACKSPACE 0x7f
@@ -8,13 +9,22 @@
 
 void hello_func(int argc, char *argv[]);
 void help_func(int argc, char *argv[]);
+void check_func(int argc, char *argv[]);
+void receive_func(int argc, char *argv[]);
+void send_func(int argc, char *argv[]);
 
 extern char receive_byte();
 extern char non_block_receive_byte();
 
+u8 rec_word[10];
+u8 send_word[10];
+
 enum {
 	HELP = 0,
 	HELLO,
+	CHECK,
+	RECEIVE,
+	SEND,
 	MAX_COMMANDS
 };
 
@@ -34,6 +44,21 @@ shell_cmd commands[] = {
 		.name = "hello",
 		.description = "saying hello",
 		.function = hello_func
+	},
+	{
+		.name = "check",
+		.description = "check nrf24l01",
+		.function = check_func
+	},
+	{
+		.name = "receive",
+		.description = "receive from nrf24l01",
+		.function = receive_func
+	},
+	{
+		.name = "send",
+		.description = "send via nrf24l01",
+		.function = send_func
 	}
 };
 
@@ -120,12 +145,55 @@ void hello_func(int argc, char *argv[]){
 	printf("Hello World\n");
 }
 
+void check_func(int argc, char *argv[]){
+	u8 Sta = ERROR;
+	printf("Check.....\n");
+	Sta = nRF_Check();
+	if(Sta == ERROR){
+		printf("Fail.....\n");
+	}else{
+		printf("Success!!!!!!\n");
+	}
+}
+
+void receive_func(int argc, char *argv[]){
+	u8 Sta;
+	printf("Receive:");
+	nRF_RX_Mode();
+	Sta = nRF_Rx_Data(rec_word);
+/*	if(Sta == RX_DR){
+		printf("RX_DR\n");
+	}*/
+	printf("%s\n", rec_word);
+	printf("Success\n");
+}
+
+void send_func(int argc, char *argv[]){
+	u8 Sta;
+	int i;
+	char *ptr;
+	nRF_TX_Mode();
+	ptr = send_word;
+	for(i = 1; i < argc; i++){
+		strcpy(ptr, argv[i]);
+		ptr += strlen(argv[i]);
+		strcpy(ptr, " ");
+		ptr += 1;
+	}
+	printf("Send:%s\n", send_word);
+	do{
+		Sta = nRF_Tx_Data(send_word);
+	}while(Sta == MAX_RT);
+	printf("Success\n");
+}
+
 void user_shell(){
 	char command[MAX_COMMAND_LEN];
 	int i;
 	char *argv[MAX_ARGV] = {NULL};
 	int argc = 0;
 	while(1){
+		argc = 0;
 		printf("evshary->");
 		read_string(command);
 		argv[argc++] = (char *)strtok(command, ' ');
