@@ -92,6 +92,8 @@ SRC +=  $(wildcard $(PROGRAM_ALG)/algorithm_*.c) \
 		$(wildcard $(PROGRAM_SYS)/QCopterFC.c) \
 		Libraries/CMSIS/FastMathFunctions/arm_cos_f32.c \
 		Libraries/CMSIS/FastMathFunctions/arm_sin_f32.c \
+		sensor.c \
+		pwm.c \
 		usartIO.c \
 		string-util.c \
 		shell.c \

@@ -38,7 +38,7 @@ void enable_rs232_interrupts(void){
 	NVIC_Init(&NVIC_InitStructure);
 }
 
-/*IRQ handler to handle USART2 interrupts(both transmit and receive interrupts)*/
+/*IRQ handler to handle USART3 interrupts(both transmit and receive interrupts)*/
 void USART3_IRQHandler(){
 	static signed portBASE_TYPE xHigherPriorityTaskWoken;
 	serial_ch_msg rx_msg;

@@ -1,5 +1,5 @@
 #include "string-util.h"
-
+#include "sensor.h"
 #define MAX_COMMAND_LEN 30
 #define BACKSPACE 0x7f
 #define ESC 0x1b
@@ -8,6 +8,7 @@
 
 void hello_func(int argc, char *argv[]);
 void help_func(int argc, char *argv[]);
+void sensor_func(int argc, char *argv[]);
 
 extern char receive_byte();
 extern char non_block_receive_byte();
@@ -15,6 +16,7 @@ extern char non_block_receive_byte();
 enum {
 	HELP = 0,
 	HELLO,
+	SENSOR,
 	MAX_COMMANDS
 };
 
@@ -34,6 +36,11 @@ shell_cmd commands[] = {
 		.name = "hello",
 		.description = "saying hello",
 		.function = hello_func
+	},
+	{
+		.name = "sensor",
+		.description = "print all data from IMU",
+		.function = sensor_func
 	}
 };
 
@@ -120,7 +127,13 @@ void hello_func(int argc, char *argv[]){
 	printf("Hello World\n");
 }
 
-void user_shell(){
+void sensor_func(int argc, char *argv[]){
+// read from ./module/module_sensor.h for the IMU data
+
+
+}
+
+void user_shell(void * pvParameters){
 	char command[MAX_COMMAND_LEN];
 	int i;
 	char *argv[MAX_ARGV] = {NULL};
