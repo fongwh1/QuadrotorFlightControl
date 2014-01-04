@@ -1,6 +1,7 @@
 #include "string-util.h"
 #include "module/module_nrf24l01.h"
 
+#include "sensor.h"
 #define MAX_COMMAND_LEN 30
 #define BACKSPACE 0x7f
 #define ESC 0x1b
@@ -12,6 +13,7 @@ void help_func(int argc, char *argv[]);
 void check_func(int argc, char *argv[]);
 void receive_func(int argc, char *argv[]);
 void send_func(int argc, char *argv[]);
+void sensor_func(int argc, char *argv[]);
 
 extern char receive_byte();
 extern char non_block_receive_byte();
@@ -25,6 +27,7 @@ enum {
 	CHECK,
 	RECEIVE,
 	SEND,
+	SENSOR,
 	MAX_COMMANDS
 };
 
@@ -59,8 +62,13 @@ shell_cmd commands[] = {
 		.name = "send",
 		.description = "send via nrf24l01",
 		.function = send_func
+	},
+	{
+		.name = "sensor",
+		.description = "print all data from IMU",
+		.function = sensor_func
 	}
-};
+};	
 
 void read_string(char *command){
 	char ch[2] = {0};
@@ -188,6 +196,13 @@ void send_func(int argc, char *argv[]){
 }
 
 void user_shell(){
+void sensor_func(int argc, char *argv[]){
+// read from ./module/module_sensor.h for the IMU data
+
+
+}
+
+void user_shell(void * pvParameters){
 	char command[MAX_COMMAND_LEN];
 	int i;
 	char *argv[MAX_ARGV] = {NULL};

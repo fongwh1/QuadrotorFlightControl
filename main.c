@@ -1,4 +1,4 @@
-/* Scheduler includes. */
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -19,6 +19,7 @@
 /* Shell includes */
 #include "shell.h"
 #include "usartIO.h"
+#include "sensor.h"
 
 int main( void )
 {
@@ -26,6 +27,13 @@ int main( void )
 	System_Init();
 	
 	USARTIO_Init();
+
+	LED_G = (Sensor_Init() == SUCCESS) ? 0 : 1;
+	Delay_10ms(100);
+
+	xTaskCreate(sensor_task,
+			   (signed portCHAR *) "Collecting data from sensors",
+			   512, NULL, tskIDLE_PRIORITY + 3, NULL);
 
 	/*Create a task*/
 	xTaskCreate(user_shell,
