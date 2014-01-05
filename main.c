@@ -20,6 +20,7 @@
 #include "shell.h"
 #include "usartIO.h"
 #include "sensor.h"
+#include "pwm.h"
 
 int main( void )
 {
@@ -31,9 +32,9 @@ int main( void )
 	LED_G = (Sensor_Init() == SUCCESS) ? 0 : 1;
 	Delay_10ms(100);
 
-	xTaskCreate(sensor_task,
+	xTaskCreate(PWM_task,
 			   (signed portCHAR *) "Collecting data from sensors",
-			   512, NULL, tskIDLE_PRIORITY + 3, NULL);
+			   512, NULL, tskIDLE_PRIORITY + 2, NULL);
 
 	/*Create a task*/
 	xTaskCreate(user_shell,

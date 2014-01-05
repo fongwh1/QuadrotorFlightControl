@@ -8,6 +8,8 @@
 #include "module_mpu6050.h"
 #include "module_mpu9150.h"
 
+#include "algorithm_moveAve.h" // for function MoveAve_SMA/MoveAve_WMA
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -41,6 +43,18 @@ void sensor_task(void * pvParameters)
   		Mag.Y  = (s16)((IMU_Buf[17] << 8) | IMU_Buf[16]);
   		Mag.Z  = (s16)((IMU_Buf[19] << 8) | IMU_Buf[18]);
 
+
+		Acc.X  -= Acc.OffsetX;
+		Acc.Y  -= Acc.OffsetY;
+		Acc.Z  -= Acc.OffsetZ;
+		Gyr.X  -= Gyr.OffsetX;
+		Gyr.Y  -= Gyr.OffsetY;
+		Gyr.Z  -= Gyr.OffsetZ;
+		Mag.X  *= Mag.AdjustX;
+		Mag.Y  *= Mag.AdjustY;
+		Mag.Z  *= Mag.AdjustZ;
+		Temp.T -= Temp.OffsetT;
+
 /*	
 		data_buf[ACCE][X]  = (s16)(Acc.TrueX*1000);  // 1 mg/LSB
 		data_buf[ACCE][Y]  = (s16)(Acc.TrueY*1000);  // 1 mg/LSB
@@ -55,7 +69,7 @@ void sensor_task(void * pvParameters)
 */
 		Delay_10ms(100);
 	
-		printf("%d,%d,%d\n", Acc.X,Acc.Y,Acc.Z);
+		printf("%d,%d,%d\n", Temp.T, Acc.Y , Acc.Z);
 	
 	}
 

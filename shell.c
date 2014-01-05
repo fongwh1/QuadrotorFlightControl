@@ -195,7 +195,6 @@ void send_func(int argc, char *argv[]){
 	printf("Success\n");
 }
 
-void user_shell(){
 void sensor_func(int argc, char *argv[]){
 // read from ./module/module_sensor.h for the IMU data
 
