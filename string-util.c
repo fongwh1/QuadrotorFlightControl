@@ -204,6 +204,15 @@ int float_to_string(double num, char*num_str, int base, int sign_or_not){
 		tmp_num /= base;
 	}
 	tmp_num = (int)(num*10000);
+
+	if(digit < 5)digit = 5;
+
+	int runner = 0;
+	for ( runner = 0 ; runner <= digit ; runner++)
+	{
+		num_str[runner]='0';
+	}//ensure digit is greater than 5; and filled with 0
+
 	if(minus_or_not == 1){
 		num_str[0] = '-';
 		digit_end = digit + 2;
@@ -221,6 +230,8 @@ int float_to_string(double num, char*num_str, int base, int sign_or_not){
 		num_str[digit_end-i] = "0123456789abcdef"[tmp_num % base];
 		
 	}
+
+//	int digit_fraction = (digit_end>5)? 6:digit_end - 2;
 
 	for( i = 0;i <= digit_end - 6;i++ )
 	{
