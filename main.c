@@ -32,7 +32,7 @@ int main( void )
 	LED_G = (Sensor_Init() == SUCCESS) ? 0 : 1;
 	Delay_10ms(100);
 
-	xTaskCreate(PWM_task,
+	xTaskCreate(sensor_task,
 			   (signed portCHAR *) "Collecting data from sensors",
 			   512, NULL, tskIDLE_PRIORITY + 2, NULL);
 
