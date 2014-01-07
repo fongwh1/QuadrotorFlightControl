@@ -16,13 +16,16 @@
 #include "semphr.h"
 
 #include "sensor.h"
-
 #include <math.h>
+
+#define	SAMPLING_TIMES	2000
 
 extern SensorAcc Acc;
 extern SensorGyr Gyr;
 extern SensorMag Mag;
 extern SensorTemp Temp;
+
+u8 IMU_Buf[20] = {0};
 
 void test(void)
 {
@@ -30,25 +33,25 @@ void test(void)
 	float c = 0;
 
 	c = atan2(a,b);
-	
-	int d;
 
-	d = (int)(c * 2000);
-
-
-
-	printf("atan2(%d,%d) = %d\n",a,b,d);
+	printf("%f,  %f,  %f,   %f,   %f\n",0.1,0.01,0.001,0.0001,0.00001);
 
 }
 
-void sensor_task(void * pvParameters)
+void sensor_offset_sampling(void)
 {
-
-	u8 IMU_Buf[20] = {0};
 	int sampling_times = SAMPLING_TIMES;
+
+	Delay_10ms(100);
+	Acc.OffsetX = 0;
+	Acc.OffsetY = 0;
+	Acc.OffsetX = 0;
 
 	while(sampling_times > 0)
 	{
+		MPU9150_Read(IMU_Buf);
+		LED_B = ~LED_B;
+
                 Acc.OffsetX  += (s16)((IMU_Buf[0]  << 8) | IMU_Buf[1]);
                 Acc.OffsetY  += (s16)((IMU_Buf[2]  << 8) | IMU_Buf[3]);
                 Acc.OffsetZ  += (s16)((IMU_Buf[4]  << 8) | IMU_Buf[5]);
@@ -74,6 +77,12 @@ void sensor_task(void * pvParameters)
 	LED_B = 0;
 	Delay_10ms(100);
 	LED_B = 1;
+}
+
+void sensor_task(void * pvParameters)
+{
+
+	sensor_offset_sampling();
 
 	while(1)
 	{
@@ -92,9 +101,9 @@ void sensor_task(void * pvParameters)
   		Mag.Z  = (s16)((IMU_Buf[19] << 8) | IMU_Buf[18]);
 
 
-		Acc.X  -= Acc.OffsetX;
-		Acc.Y  -= Acc.OffsetY;
-		Acc.Z  -= Acc.OffsetZ;
+		Acc.TrueX  = LOW_PASS(Acc.TrueX,(Acc.X - Acc.OffsetX));
+		Acc.TrueY  = LOW_PASS(Acc.TrueY,(Acc.Y - Acc.OffsetY));
+		Acc.TrueZ  = LOW_PASS(Acc.TrueZ,(Acc.Z - Acc.OffsetZ));
 		Gyr.X  -= Gyr.OffsetX;
 		Gyr.Y  -= Gyr.OffsetY;
 		Gyr.Z  -= Gyr.OffsetZ;
@@ -104,8 +113,9 @@ void sensor_task(void * pvParameters)
 		Temp.T -= Temp.OffsetT;
 
 		Delay_10ms(10);
-	
-		printf("Acc: %d,%d,%d\nGyr: %d,%d,%d\n", Acc.X, Acc.Y , Acc.Z, Gyr.X, Gyr.Y, Gyr.Z);
+		test();
+		printf("Acc: %f,%f,%f\n", Acc.TrueX, Acc.TrueY, Acc.TrueZ);
+//		printf("Gyr: %d,%d,%d\n", Gyr.X, Gyr.Y, Gyr.Z);
 
 	
 	}
