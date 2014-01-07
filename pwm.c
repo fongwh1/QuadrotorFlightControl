@@ -60,17 +60,27 @@ void PWM_test(void){
 }
 */
 void PWM_run(){
-	PWM_Motor1 = 1800;
-  	PWM_Motor2 = 1800;
-  	PWM_Motor3 = 1800;
-  	PWM_Motor4 = 1800;
+	int PWM_pulse = PWM_Motor1;
+	while(PWM_pulse < 1800){
+		PWM_pulse += 200;
+		PWM_Motor1 = PWM_pulse;
+  		PWM_Motor2 = PWM_pulse;
+  		PWM_Motor3 = PWM_pulse;
+  		PWM_Motor4 = PWM_pulse;
+		Delay_10ms(5);
+	}
 }
 
 void PWM_stop(){
-	PWM_Motor1 = 0;
-  	PWM_Motor2 = 0;
-  	PWM_Motor3 = 0;
-  	PWM_Motor4 = 0;
+	int PWM_pulse = PWM_Motor1;
+	while(PWM_pulse > 0){
+		PWM_pulse -= 200;
+		PWM_Motor1 = PWM_pulse;
+  		PWM_Motor2 = PWM_pulse;
+  		PWM_Motor3 = PWM_pulse;
+  		PWM_Motor4 = PWM_pulse;
+		Delay_10ms(5);
+	}
 }
 
 void PWM_task(void * pvParameters)

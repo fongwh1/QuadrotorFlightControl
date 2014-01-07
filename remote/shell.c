@@ -14,12 +14,13 @@ void check_func(int argc, char *argv[]);
 void receive_func(int argc, char *argv[]);
 void send_func(int argc, char *argv[]);
 void sensor_func(int argc, char *argv[]);
+void pwm_func(int argc, char *argv[]);
 
 extern char receive_byte();
 extern char non_block_receive_byte();
 
-u8 rec_word[10];
-u8 send_word[10];
+u8 rec_word[BUF_SIZE];
+u8 send_word[BUF_SIZE];
 
 enum {
 	HELP = 0,
@@ -28,6 +29,7 @@ enum {
 	RECEIVE,
 	SEND,
 	SENSOR,
+	PWM,
 	MAX_COMMANDS
 };
 
@@ -67,7 +69,12 @@ shell_cmd commands[] = {
 		.name = "sensor",
 		.description = "print all data from IMU",
 		.function = sensor_func
-	}
+	},
+	{
+		.name = "pwm",
+		.description = "print all data from PWM",
+		.function = pwm_func
+	},
 };	
 
 void read_string(char *command){
@@ -193,6 +200,8 @@ void send_func(int argc, char *argv[]){
 		strcpy(ptr, " ");
 		ptr += 1;
 	}
+	ptr -= 1;
+	strcpy(ptr, "\0");
 	printf("Send:%s\n", send_word);
 	Sta = nRF_Tx_Nonblock_Data(send_word);
 	/*
@@ -214,10 +223,47 @@ void send_func(int argc, char *argv[]){
 	}
 }
 
+void send(char *send_str){
+	u8 Sta;
+	strcpy(send_word, send_str);
+	nRF_TX_Mode();
+	printf("Send:%s\n", send_word);
+	Sta = nRF_Tx_Nonblock_Data(send_word);
+	if(Sta == TX_DS){
+		printf("Success\n");
+	}else{
+		printf("Failure\n");
+	}
+}
+
+void receive(char *rec_str){
+	u8 Sta;
+	printf("Receive:");
+	nRF_RX_Mode();
+	Sta = nRF_Rx_Nonblock_Data(rec_word);
+	strcpy(rec_str, rec_word);
+	if(Sta == RX_DR){
+		//printf("%s\n", rec_str);
+		printf("Success\n");
+	}else{
+		printf("Error\n");
+	}
+}
+
 void sensor_func(int argc, char *argv[]){
-// read from ./module/module_sensor.h for the IMU data
+	char *str = "sensor";
+	char rec_str[BUF_SIZE];
+	send(str);
+	receive(rec_str);
+	printf("Result:%s\n", rec_str);
+}
 
-
+void pwm_func(int argc, char *argv[]){
+	char *str = "pwm";
+	char rec_str[BUF_SIZE];
+	send(str);
+	receive(rec_str);
+	printf("Result:%s\n", rec_str);
 }
 
 void user_shell(void * pvParameters){
