@@ -2,18 +2,19 @@
 #include "stm32f4xx.h"
 #include "stm32f4_delay.h"
 #include "string-util.h"
+#include "pwm.h"
+
+extern char status;
 
 void PWM_Config( void ){
-
 	Motor_Config();
-
 }
 
 void PWM_print()
 {
         printf("1: %d 2: %d 3: %d 4: %d\n",PWM_Motor1,PWM_Motor2,PWM_Motor3,PWM_Motor4);
 }
-
+/*
 void PWM_test(void){
 
 	u16	PWM_pulse = PWM_MOTOR_MIN;
@@ -57,15 +58,28 @@ void PWM_test(void){
 	}
 
 }
+*/
+void PWM_run(){
+	PWM_Motor1 = 1800;
+  	PWM_Motor2 = 1800;
+  	PWM_Motor3 = 1800;
+  	PWM_Motor4 = 1800;
+}
 
+void PWM_stop(){
+	PWM_Motor1 = 0;
+  	PWM_Motor2 = 0;
+  	PWM_Motor3 = 0;
+  	PWM_Motor4 = 0;
+}
 
 void PWM_task(void * pvParameters)
 {
-	
-	PWM_test();
-
-	while(1)
-	{
+	//PWM_run();
+	PWM_stop();
+	while(1){
+		PWM_print();
+		Delay_100ms(1);
 	}
-
+	//PWM_test();
 }

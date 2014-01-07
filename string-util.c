@@ -82,17 +82,13 @@ int strlen(char *string){
 	return len;
 }
 
-int strcmp(char *str1, char *str2){
-	char *cur1 = str1;
-	char *cur2 = str2;
-	int i = 0;
-	while(cur1[i] == cur2[i]){
-		if(cur1[i] == '\0'){
-			return 0;
-		}
-		i++;
+int printf(const char *format, ...);
+
+int strcmp(const char *str1, const char *str2){
+	while(*str1 != '\0' && *str2 != '\0' && (*str1==*str2)){
+		str1++,str2++;
 	}
-	return -1;
+	return *(const unsigned char*)str1-*(const unsigned char*)str2;
 }
 
 int strcat(char *str1, char *str2){
@@ -105,7 +101,6 @@ int strcat(char *str1, char *str2){
 	return 1;
 }
 
-int printf(const char *format, ...);
 
 char *strtok(char *split_str, const char delim){
 	static char *current_ptr;

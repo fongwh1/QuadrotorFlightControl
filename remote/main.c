@@ -16,10 +16,8 @@
 #include "module_nrf24l01.h"
 
 /* Shell includes */
+#include "shell.h"
 #include "usartIO.h"
-#include "sensor.h"
-#include "pwm.h"
-#include "transport.h"
 
 int main( void )
 {
@@ -28,24 +26,10 @@ int main( void )
 	
 	USARTIO_Init();
 
-	LED_G = (Sensor_Init() == SUCCESS) ? 0 : 1;
-
 	/*Create a task*/
-	xTaskCreate(sensor_task,
-			   (signed portCHAR *) "Collecting data from sensors",
-			   512, NULL, tskIDLE_PRIORITY + 2, NULL);
-
-	xTaskCreate(PWM_task,
-			   (signed portCHAR *) "Assign value to PWM",
-			   512, NULL, tskIDLE_PRIORITY + 2, NULL);
-/*
 	xTaskCreate(user_shell,
 			   (signed portCHAR *) "User Shell",
-*///			   512 /*stack size*/, NULL, tskIDLE_PRIORITY + 2, NULL);
-
-	xTaskCreate(transport_task,
-			   (signed portCHAR *) "Receive and send value",
-			   512, NULL, tskIDLE_PRIORITY + 2, NULL);
+			   512 /*stack size*/, NULL, tskIDLE_PRIORITY + 2, NULL);
 
 	/*Start running the tasks.*/
 	vTaskStartScheduler();

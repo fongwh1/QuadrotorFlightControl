@@ -77,7 +77,9 @@ void nRF_RX_Mode( void );
 void nRF_TX_Mode( void );
 u8 nRF_Check( void );
 u8 nRF_Tx_Data( u8* );
+u8 nRF_Tx_Nonblock_Data( u8* );
 u8 nRF_Rx_Data( u8* );
+u8 nRF_Rx_Nonblock_Data( u8* );
 /*====================================================================================================*/
 /*====================================================================================================*/
 extern u8 TxBuf[SendTimes][TxBufSize];

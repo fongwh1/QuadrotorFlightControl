@@ -256,6 +256,36 @@ u8 nRF_Tx_Data( u8 *TxBuf )
   else
     return ERROR;
 }
+
+u8 nRF_Tx_Nonblock_Data( u8 *TxBuf )
+{
+  u8 Sta;
+
+  NRF_CE = 0;
+  nRF_WriteBuf(WR_TX_PLOAD, TxBuf, TX_PLOAD_WIDTH);
+  NRF_CE = 1;
+
+  int i = 0;
+  while(NRF_IRQ!=0){
+	Delay_10ms(10);
+	if(i == 10){
+		printf("timeout\n");
+		return ERROR;
+	}
+	i++;
+  };
+
+  Sta = nRF_ReadReg(STATUS);
+  nRF_WriteReg(NRF_WRITE+STATUS, Sta);
+  nRF_WriteReg(FLUSH_TX, NOP);
+
+  if(Sta&MAX_RT)
+    return MAX_RT;
+  else if(Sta&TX_DS)
+    return TX_DS;
+  else
+    return ERROR;
+}
 /*=====================================================================================================*/
 /*=====================================================================================================*
 **函數 : nRF_Rx_Data
@@ -271,6 +301,34 @@ u8 nRF_Rx_Data( u8 *RxBuf )
 
   NRF_CE = 1;
   while(NRF_IRQ!=0);
+  NRF_CE = 0;
+
+  Sta = nRF_ReadReg(STATUS);
+  nRF_WriteReg(NRF_WRITE+STATUS, Sta);
+
+  if(Sta&RX_DR) {
+    nRF_ReadBuf(RD_RX_PLOAD, RxBuf, RX_PLOAD_WIDTH);
+    nRF_WriteReg(FLUSH_RX, NOP);
+    return RX_DR;
+  }
+  else
+    return ERROR;
+}
+
+u8 nRF_Rx_Nonblock_Data( u8 *RxBuf )
+{
+  u8 Sta;
+
+  NRF_CE = 1;
+  int i = 0;
+  while(NRF_IRQ!=0){
+	Delay_10ms(10);
+	if(i == 10){
+		printf("timeout\n");
+		return ERROR;
+	}
+	i++;
+  };
   NRF_CE = 0;
 
   Sta = nRF_ReadReg(STATUS);

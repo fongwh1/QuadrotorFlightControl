@@ -6,17 +6,17 @@ BIN_IMAGE=main.bin
 #Cross Compiler
 CC=arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
-ST_LIB = ./Libraries/STM32F4xx_StdPeriph_Driver
-PROGRAM_ALG = ./math
-PROGRAM_DIR = ./driver
-PROGRAM_MOD = ./module
-PROGRAM_SYS = ./system
+ST_LIB = ../Libraries/STM32F4xx_StdPeriph_Driver
+PROGRAM_ALG = ../math
+PROGRAM_DIR = ../driver
+PROGRAM_MOD = ../module
+PROGRAM_SYS = ../system
 
 #PLATFORM
 COMPILER = GCC
 PLAT = ARM_CM4F
 
-FREERTOS = ./Libraries/freertos
+FREERTOS = ../Libraries/freertos
 FREERTOS_INC = $(FREERTOS)/include
 FREERTOS_PTB = $(FREERTOS)/portable/$(COMPILER)/$(PLAT)	
 
@@ -30,9 +30,9 @@ CFLAGS+=-ffreestanding -nostdlib
 #CFLAGS+=-Wall -Wno-unused-function
 
 #Flash
-CFLAGS+=-Wl,-T,stm32.ld
+CFLAGS+=-Wl,-T,../stm32.ld
 
-CFLAGS+=-I./
+CFLAGS+=-I../
 
 #STM32 CMSIS
 CFLAGS+= \
@@ -42,24 +42,24 @@ CFLAGS+= \
 	-D ARM_MATH_CM4
 	# __FPU_USED=1
 	#__CC_ARM
-CFLAGS+=-I./Libraries/CMSIS
+CFLAGS+=-I../Libraries/CMSIS
 #STM32F4xx Peripherys including
-CFLAGS+=-I./Libraries/STM32F4xx_StdPeriph_Driver/inc
+CFLAGS+=-I../Libraries/STM32F4xx_StdPeriph_Driver/inc
 
 #FreeRTOS including
 CFLAGS+=-I$(FREERTOS_INC)
 CFLAGS+=-I$(FREERTOS_PTB)
 
 #Major programs including
-CFLAGS+=-I./system
-CFLAGS+=-I./math
-CFLAGS+=-I./driver
-CFLAGS+=-I./module
+CFLAGS+=-I../system
+CFLAGS+=-I../math
+CFLAGS+=-I../driver
+CFLAGS+=-I../module
 
 LDFLAGS += -lm -lc -lgcc
 
 #STM32 CMSIS
-SRC=$(wildcard ./Libraries/CMSIS/*.c)
+SRC=$(wildcard ../Libraries/CMSIS/*.c)
 #STM32F4xx Peripherys source code
 #SRC+=$(wildcard ./Libraries/STM32F4xx_StdPeriph_Driver/src/*.c)
 #SRC+= ./Libraries/CMSIS/system_stm32f4xx.c 
@@ -90,13 +90,11 @@ SRC +=  $(wildcard $(PROGRAM_ALG)/algorithm_*.c) \
 		$(wildcard $(PROGRAM_MOD)/module_*.c) \
 		$(wildcard $(PROGRAM_SYS)/QCopterFC_*.c) \
 		$(wildcard $(PROGRAM_SYS)/QCopterFC.c) \
-		Libraries/CMSIS/FastMathFunctions/arm_cos_f32.c \
-		Libraries/CMSIS/FastMathFunctions/arm_sin_f32.c \
-		sensor.c \
-		pwm.c \
-		transport.c \
-		usartIO.c \
-		string-util.c \
+		../Libraries/CMSIS/FastMathFunctions/arm_cos_f32.c \
+		../Libraries/CMSIS/FastMathFunctions/arm_sin_f32.c \
+		../usartIO.c \
+		../string-util.c \
+		shell.c \
 		main.c
 
 INC_HEADERS =	$(wildcard $(PROGRAM_ALG)/*.h) \
@@ -108,7 +106,7 @@ INC_HEADERS =	$(wildcard $(PROGRAM_ALG)/*.h) \
 
 
 #STM32 startup file
-STARTUP=./Libraries/CMSIS/startup_stm32f4xx.s
+STARTUP=../Libraries/CMSIS/startup_stm32f4xx.s
 #======================================================================#
 
 #Make all
@@ -117,7 +115,7 @@ all:$(BIN_IMAGE)
 $(BIN_IMAGE):$(EXECUTABLE)
 	$(OBJCOPY) -O binary $^ $@
 
-STARTUP_OBJ = startup_stm32f4xx.o
+STARTUP_OBJ = ../startup_stm32f4xx.o
 
 $(STARTUP_OBJ): $(STARTUP) 
 	$(CC) $(CFLAGS) $^ -c $(STARTUP)

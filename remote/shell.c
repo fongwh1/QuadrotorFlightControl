@@ -168,12 +168,17 @@ void receive_func(int argc, char *argv[]){
 	u8 Sta;
 	printf("Receive:");
 	nRF_RX_Mode();
-	Sta = nRF_Rx_Data(rec_word);
+	//Sta = nRF_Rx_Data(rec_word);
+	Sta = nRF_Rx_Nonblock_Data(rec_word);
 /*	if(Sta == RX_DR){
 		printf("RX_DR\n");
 	}*/
-	printf("%s\n", rec_word);
-	printf("Success\n");
+	if(Sta == RX_DR){
+		printf("%s\n", rec_word);
+		printf("Success\n");
+	}else{
+		printf("Error\n");
+	}
 }
 
 void send_func(int argc, char *argv[]){
@@ -189,10 +194,24 @@ void send_func(int argc, char *argv[]){
 		ptr += 1;
 	}
 	printf("Send:%s\n", send_word);
+	Sta = nRF_Tx_Nonblock_Data(send_word);
+	/*
+	i = 0;
 	do{
 		Sta = nRF_Tx_Data(send_word);
+		if(Sta == TX_DS)break;
+		if(i == 1000){
+			Sta = ERROR;
+			break;
+		}
+		i++;
 	}while(Sta == MAX_RT);
-	printf("Success\n");
+*/
+	if(Sta == TX_DS){
+		printf("Success\n");
+	}else{
+		printf("Failure\n");
+	}
 }
 
 void sensor_func(int argc, char *argv[]){
