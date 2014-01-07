@@ -178,6 +178,64 @@ int num_to_string(unsigned int num, char*num_str, int base, int sign_or_not){
 	return 1;
 }
 
+int float_to_string(double num, char*num_str, int base, int sign_or_not){
+	int digit = 0;
+	int digit_end;
+	int tmp_num = (int)(num*10000);
+	int minus_or_not = 0;
+	int i;
+	if(tmp_num == 0){
+		num_str[0] = '0';
+		num_str[1] = '\0';
+		return 1;
+	}
+	if((int)tmp_num < 0){
+		num = (int)-num;
+		tmp_num = num;
+		minus_or_not = 1;
+	}
+	while(tmp_num != 0){
+		digit++;
+		tmp_num /= base;
+	}
+	tmp_num = (int)(num*10000);
+
+	if(digit < 5)digit = 5;
+
+	int runner = 0;
+	for ( runner = 0 ; runner <= digit ; runner++)
+	{
+		num_str[runner]='0';
+	}//ensure digit is greater than 5; and filled with 0
+
+	if(minus_or_not == 1){
+		num_str[0] = '-';
+		digit_end = digit + 2;
+		num_str[digit_end] = '\0';
+	}else{
+		digit_end = digit+1;
+		num_str[digit_end] = '\0';
+	}
+	for(i = 1; i <= digit; i++, tmp_num/=base){
+/*		if(i == 5)
+		{
+			num_str[i] = '.';
+			i+=1;
+		}*/
+		num_str[digit_end-i] = "0123456789abcdef"[tmp_num % base];
+		
+	}
+
+//	int digit_fraction = (digit_end>5)? 6:digit_end - 2;
+
+	for( i = 0;i <= digit_end - 6;i++ )
+	{
+		num_str[i] = num_str[i+1];
+	}
+	num_str[digit_end - 5] = '.';
+	return 1;
+}
+
 static int common_printf(char *dest, const char *format, va_list param){
 	char *pstr = dest;
 	while(*format != '\0'){
@@ -200,6 +258,9 @@ static int common_printf(char *dest, const char *format, va_list param){
 					break;
 				case 'f':
 				case 'F':
+					float_to_string(va_arg(param, double), pstr, 10, 1);
+					pstr += strlen(pstr);
+					break;
 				case 'X':
 				case 'x':
 					num_to_string(va_arg(param, int), pstr, 16, 1);

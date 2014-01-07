@@ -51,9 +51,9 @@ u8 Sensor_Init( void )
   Acc.X = 0;
   Acc.Y = 0;
   Acc.Z = 0;
-  Acc.OffsetX = +7;
-  Acc.OffsetY = +146;
-  Acc.OffsetZ = -291;
+  Acc.OffsetX = 0;//+7;
+  Acc.OffsetY = 0;//+146;
+  Acc.OffsetZ = 0;//-291;
   Acc.TrueX = 0.0f;
   Acc.TrueY = 0.0f;
   Acc.TrueZ = 0.0f;

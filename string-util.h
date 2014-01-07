@@ -12,6 +12,7 @@ int strcmp(char *str1, char *str2);
 int strcat(char *str1, char *str2);
 void print(char *print_str);
 int num_to_string(int num, char*num_str, int base, int sign_or_not);
+int float_to_string(double num, char*num_str, int base, int sign_or_not);
 void my_printf(const char *format, ...);
 int sprintf(char *dest, const char *format, ...);
 
