@@ -190,49 +190,47 @@ int float_to_string(double num, char*num_str, int base, int sign_or_not){
 		return 1;
 	}
 	if((int)tmp_num < 0){
-		num = (int)-num;
-		tmp_num = num;
+		num = -num;
+		tmp_num = (int)(num*10000);
 		minus_or_not = 1;
 	}
 	while(tmp_num != 0){
 		digit++;
 		tmp_num /= base;
 	}
-	tmp_num = (int)(num*10000);
 
 	if(digit < 5)digit = 5;
 
-	int runner = 0;
-	for ( runner = 0 ; runner <= digit ; runner++)
-	{
-		num_str[runner]='0';
-	}//ensure digit is greater than 5; and filled with 0
+	tmp_num = (unsigned int)(num*10000);
 
-	if(minus_or_not == 1){
-		num_str[0] = '-';
+	if(base == 16){
+		num_str[0] = '0';
+		num_str[1] = 'x';
 		digit_end = digit + 2;
 		num_str[digit_end] = '\0';
+	}else if(minus_or_not == 1){
+		num_str[0] = '-';
+		digit_end = digit + 1;
+		num_str[digit_end] = '\0';
 	}else{
-		digit_end = digit+1;
+		digit_end = digit;
 		num_str[digit_end] = '\0';
 	}
 	for(i = 1; i <= digit; i++, tmp_num/=base){
-/*		if(i == 5)
-		{
-			num_str[i] = '.';
-			i+=1;
-		}*/
 		num_str[digit_end-i] = "0123456789abcdef"[tmp_num % base];
-		
 	}
 
-//	int digit_fraction = (digit_end>5)? 6:digit_end - 2;
+	digit_end++;
 
-	for( i = 0;i <= digit_end - 6;i++ )
+	int backward_i;
+
+	for(backward_i = digit_end; backward_i > digit_end - 5;backward_i--)
 	{
-		num_str[i] = num_str[i+1];
+		num_str[backward_i] = num_str[backward_i - 1];
 	}
+
 	num_str[digit_end - 5] = '.';
+
 	return 1;
 }
 
