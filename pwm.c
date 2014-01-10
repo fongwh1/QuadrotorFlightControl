@@ -4,6 +4,7 @@
 #include "string-util.h"
 #include "pwm.h"
 
+
 extern char status;
 
 void PWM_Config( void ){
@@ -14,64 +15,51 @@ void PWM_print()
 {
         printf("1: %d 2: %d 3: %d 4: %d\n",PWM_Motor1,PWM_Motor2,PWM_Motor3,PWM_Motor4);
 }
-/*
-void PWM_test(void){
 
-	u16	PWM_pulse = PWM_MOTOR_MIN;
-	u8 	count;
-	while( 1 ){
-		while(PWM_pulse < PWM_MOTOR_MAX - 200)
-		{
-			PWM_pulse += 10 ;
+void PWM_all_motor_pulse(int pulse){
 
-			PWM_Motor1 = PWM_pulse;
-  			PWM_Motor2 = PWM_pulse;
-  			PWM_Motor3 = PWM_pulse;
-  			PWM_Motor4 = PWM_pulse;
-			
-			if ((PWM_pulse % 100) == 0 )
-			{
-				PWM_print();
-			}
-
-			Delay_100ms(1);
-		}
-
-		while(PWM_pulse > PWM_MOTOR_MIN)
-		{
-			PWM_pulse -= 10;
-
-			PWM_Motor1 = PWM_pulse;
-                        PWM_Motor2 = PWM_pulse;
-                        PWM_Motor3 = PWM_pulse;
-                        PWM_Motor4 = PWM_pulse;
-
-			if ((PWM_pulse % 100) == 0 )
-                        {
-                                PWM_print();
-                        }
-
-
-                        Delay_100ms(1);
-		}		
-
+	if(pulse <= 1900 && pulse >800)
+	{
+		PWM_Motor1 = pulse;
+		Delay_100us(5);
+		PWM_Motor2 = pulse;
+		Delay_100us(5);
+		PWM_Motor3 = pulse;
+		Delay_100us(5);
+		PWM_Motor4 = pulse;
+		Delay_100us(5);
 	}
 
 }
-*/
+
 void PWM_run(){
-	int PWM_pulse = PWM_Motor1;
-	while(PWM_pulse < 1800){
-		PWM_pulse += 200;
-		PWM_Motor1 = PWM_pulse;
-  		PWM_Motor2 = PWM_pulse;
-  		PWM_Motor3 = PWM_pulse;
-  		PWM_Motor4 = PWM_pulse;
-		Delay_10ms(5);
+	int pwm_pulse = PWM_Motor1;
+		while(pwm_pulse <= 1500)
+		{
+			pwm_pulse += 20;
+			PWM_all_motor_pulse(pwm_pulse);
+			PWM_print();
+		}
+/*
+	int PWM_pulse = 1600;
+	if(PWM_pulse <= 1600){
+		PWM_pulse += 100;
+		
+		Delay_10ms(10);
 	}
+*/
 }
 
 void PWM_stop(){
+	int pwm_pulse = PWM_Motor1;
+
+		while(pwm_pulse > 800)
+		{
+			pwm_pulse -= 15;
+			PWM_all_motor_pulse(pwm_pulse);
+			PWM_print();
+		}
+/*
 	int PWM_pulse = PWM_Motor1;
 	while(PWM_pulse > 0){
 		PWM_pulse -= 200;
@@ -81,15 +69,36 @@ void PWM_stop(){
   		PWM_Motor4 = PWM_pulse;
 		Delay_10ms(5);
 	}
+*/
 }
 
 void PWM_task(void * pvParameters)
 {
-	//PWM_run();
-	PWM_stop();
-	while(1){
-		PWM_print();
-		Delay_100ms(1);
-	}
-	//PWM_test();
+
+//	int pwm_pulse = 1300;
+
+	Delay_100ms(20);
+	printf("PWM runs in 10 sec\n");
+	Delay_100ms(20);
+
+/*
+		while(pwm_pulse <= 1900)
+		{
+			pwm_pulse += 10;
+			PWM_all_motor_pulse(pwm_pulse);
+			PWM_print();
+		}
+
+		while(pwm_pulse > 800)
+		{
+			pwm_pulse -= 15;
+			PWM_all_motor_pulse(pwm_pulse);
+			PWM_print();
+		}
+
+		Delay_1ms(50);
+*/
+
+
+	while(1);
 }

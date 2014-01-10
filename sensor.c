@@ -18,7 +18,9 @@
 #include "sensor.h"
 #include <math.h>
 
-#define	SAMPLING_TIMES	2000
+#define	SAMPLING_TIMES	100
+#define DELTA_T	(float)0.11
+#define GYROSCOPE_SENSITIVITY 65.536
 
 extern SensorAcc Acc;
 extern SensorGyr Gyr;
@@ -27,6 +29,8 @@ extern SensorTemp Temp;
 
 u8 IMU_Buf[20] = {0};
 
+float angle, angle_vec = 0;
+
 void test(void)
 {
 	int a = 1, b = 0;
@@ -34,7 +38,7 @@ void test(void)
 
 	c = atan2(a,b);
 
-	printf("%f,  %f,  %f,   %f,   %f\n",0.1,0.01,0.001,0.0001,0.00001);
+	printf("%f,  %f,  %f,   %f,   %f\n",-0.1,0.01,0.001,-0.0001,0.00001);
 
 }
 
@@ -42,47 +46,70 @@ void sensor_offset_sampling(void)
 {
 	int sampling_times = SAMPLING_TIMES;
 
-	Delay_10ms(100);
+	Delay_10ms(10);
+
+	int OffsetX = 0,OffsetY = 0, OffsetZ = 0,gOffsetX = 0,gOffsetY = 0,gOffsetZ = 0;
+
 	Acc.OffsetX = 0;
 	Acc.OffsetY = 0;
 	Acc.OffsetX = 0;
+
+	Gyr.OffsetX = 0;
+	Gyr.OffsetY = 0;
+	Gyr.OffsetZ = 0;
 
 	while(sampling_times > 0)
 	{
 		MPU9150_Read(IMU_Buf);
 		LED_B = ~LED_B;
 
-                Acc.OffsetX  += (s16)((IMU_Buf[0]  << 8) | IMU_Buf[1]);
-                Acc.OffsetY  += (s16)((IMU_Buf[2]  << 8) | IMU_Buf[3]);
-                Acc.OffsetZ  += (s16)((IMU_Buf[4]  << 8) | IMU_Buf[5]);
+                OffsetX  += (s16)((IMU_Buf[0]  << 8) | IMU_Buf[1]);
+                OffsetY  += (s16)((IMU_Buf[2]  << 8) | IMU_Buf[3]);
+                OffsetZ  += (s16)((IMU_Buf[4]  << 8) | IMU_Buf[5]);
                 Temp.T = (s16)((IMU_Buf[6]  << 8) | IMU_Buf[7]);
-                Gyr.OffsetX  += (s16)((IMU_Buf[8]  << 8) | IMU_Buf[9]);
-                Gyr.OffsetY  += (s16)((IMU_Buf[10] << 8) | IMU_Buf[11]);
-                Gyr.OffsetZ  += (s16)((IMU_Buf[12] << 8) | IMU_Buf[13]);
+                gOffsetX  += (s16)((IMU_Buf[8]  << 8) | IMU_Buf[9]);
+                gOffsetY  += (s16)((IMU_Buf[10] << 8) | IMU_Buf[11]);
+                gOffsetZ  += (s16)((IMU_Buf[12] << 8) | IMU_Buf[13]);
                 Mag.X  = (s16)((IMU_Buf[15] << 8) | IMU_Buf[14]);
                 Mag.Y  = (s16)((IMU_Buf[17] << 8) | IMU_Buf[16]);
                 Mag.Z  = (s16)((IMU_Buf[19] << 8) | IMU_Buf[18]);
 	
 		sampling_times--;
+
+		Delay_10ms(1);
+
+//		printf("%f %d %d %d\n", dt, OffsetX, OffsetY, OffsetZ);
+
 	}
 
-	Acc.OffsetX /= SAMPLING_TIMES;
-	Acc.OffsetY /= SAMPLING_TIMES;
-	Acc.OffsetZ /= SAMPLING_TIMES;
+	Acc.OffsetX = (s16)(OffsetX/SAMPLING_TIMES);
+	Acc.OffsetY = (s16)(OffsetY/SAMPLING_TIMES);
+	Acc.OffsetZ = (s16)(OffsetZ/SAMPLING_TIMES);
 
-	Gyr.OffsetX /= SAMPLING_TIMES;
-	Gyr.OffsetY /= SAMPLING_TIMES;
-	Gyr.OffsetZ /= SAMPLING_TIMES;
-	
+	Gyr.OffsetX = (s16)(gOffsetX/SAMPLING_TIMES);
+	Gyr.OffsetY = (s16)(gOffsetY/SAMPLING_TIMES);
+	Gyr.OffsetZ = (s16)(gOffsetZ/SAMPLING_TIMES);
+
+//	printf("offset sampling result:X: %d Y:%d Z:%d \n",Acc.OffsetX,Acc.OffsetY,Acc.OffsetZ);
+//	printf("offset sampling result:X: %d Y:%d Z:%d \n",Gyr.OffsetX,Gyr.OffsetY,Gyr.OffsetZ);
+
 	LED_B = 0;
 	Delay_10ms(100);
 	LED_B = 1;
 }
 
+void complementary_filter()
+{
+	angle = (0.98*(angle + Gyr.X * DELTA_T) + (0.02*(Acc.TrueX)));
+	printf("%f\n",angle);
+}
+
 void sensor_task(void * pvParameters)
 {
-
+	u8 print_count = 0;
 	sensor_offset_sampling();
+
+	float running_time = 0;
 
 	while(1)
 	{
@@ -112,12 +139,20 @@ void sensor_task(void * pvParameters)
 		Mag.Z  *= Mag.AdjustZ;
 		Temp.T -= Temp.OffsetT;
 
-		Delay_10ms(10);
-		test();
-		printf("Acc: %f,%f,%f\n", Acc.TrueX, Acc.TrueY, Acc.TrueZ);
-//		printf("Gyr: %d,%d,%d\n", Gyr.X, Gyr.Y, Gyr.Z);
+		complementary_filter();
 
+		Delay_1ms(8);
+
+//		if( print_count == 0){
+//		printf("%f %f %f %f\n",running_time, Acc.TrueX, Acc.TrueY, Acc.TrueZ);
+		running_time += DELTA_T;// should be dt
+//		printf("Gyr: %d %d %d\n", Gyr.X, Gyr.Y, Gyr.Z);
+//		print_count = 0;
+//		}
+//		print_count++;
 	
 	}
 
 }
+
+

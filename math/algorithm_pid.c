@@ -42,7 +42,7 @@ void PID_Init( PID_Struct *PID )
 **功能 : Calculate Incremental PID
 **輸入 : PID, CurrentVal
 **輸出 : None
-**使用 : PID_IncCal(&PID, CurrentVal)
+ensor.h*使用 : PID_IncCal(&PID, CurrentVal)
 **=====================================================================================================*/
 /*=====================================================================================================*/
 float PID_IncCal( PID_Struct *PID, float CurrentVal )
