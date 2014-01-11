@@ -6,6 +6,7 @@
 #include "transport.h"
 
 extern char status;
+extern int status_mod_num;
 
 void PWM_Config( void ){
 	Motor_Config();
@@ -99,7 +100,7 @@ void PWM_task(void * pvParameters)
 		Delay_1ms(50);
 */
 
-
+	int expected_pwm = 0;
 	int pwm_pulse;
 	status = STOP;
 	while(1){
@@ -114,6 +115,24 @@ void PWM_task(void * pvParameters)
 			PWM_all_motor_pulse(pwm_pulse);
 			PWM_print();
 			//PWM_start();
+		}else if(status == MOD){
+			expected_pwm = pwm_pulse + status_mod_num;
+
+			while(pwm_pulse != expected_pwm)
+			{
+				if (pwm_pulse > expected_pwm)
+				{
+
+					pwm_pulse -=10;
+
+				}else{
+					pwm_pulse +=10;
+
+				}
+				PWM_all_motor_pulse(pwm_pulse);
+				PWM_print();
+			}
+			status = IDLE;
 		}
 	}
 }

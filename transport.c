@@ -10,6 +10,7 @@
 
 char rec_word[BUF_SIZE];
 u8 status;
+int status_mod_num;
 
 void transport(char* send_str){
 	u8 Sta;
@@ -21,6 +22,22 @@ void transport(char* send_str){
 	}else{
 		printf("Failure\n");
 	}
+}
+
+int string_to_num(char *str){
+	int digit = 0;
+	int sum = 0;
+	int i = 0;
+	while(1){
+		if(*(str+i) == '\0')break;
+		digit++;
+		i++;
+	}
+	for(i = 0; i < digit; i++){
+		sum *= 10;
+		sum += *(str+i)-48;
+	}
+	return sum;
 }
 
 void check_status(){
@@ -47,6 +64,14 @@ void check_status(){
 		printf("send sensor\n");
 		sprintf(send_str, "Acc: %f, %f, %f\n", Acc.TrueX, Acc.TrueY, Acc.TrueZ);
 		transport(send_str);
+	}else if(cmp_word[0] == 'u'){
+		status_mod_num = string_to_num(cmp_word + 1);
+		printf("motor add %d\n", status_mod_num);
+		status = MOD;
+	}else if(cmp_word[0] == 'd'){
+		status_mod_num = string_to_num(cmp_word + 1) * (-1);
+		printf("motor add %d\n", status_mod_num);
+		status = MOD;
 	}
 }
 
