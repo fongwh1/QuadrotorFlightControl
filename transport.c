@@ -4,10 +4,12 @@
 #include "pwm.h"
 #include "sensor.h"
 #include "module_sensor.h"
+#include "transport.h"
 
 #define BUF_SIZE 50
 
 char rec_word[BUF_SIZE];
+u8 status;
 
 void transport(char* send_str){
 	u8 Sta;
@@ -31,10 +33,12 @@ void check_status(){
 	
 	if(strcmp(cmp_word, "stop") == 0){
 		printf("motor stop!!\n");
-		PWM_stop();
+		status = STOP;
+		//PWM_stop();
 	}else if(strcmp(cmp_word, "start") == 0){
 		printf("motor start!!\n");
-		PWM_run();
+		status = START;
+		//PWM_run();
 	}else if(strcmp(cmp_word, "pwm") == 0){
 		printf("send pwm\n");
 		sprintf(send_str, "1:%d 2:%d 3:%d 4:%d\n", PWM_Motor1, PWM_Motor2, PWM_Motor3, PWM_Motor4);
@@ -55,6 +59,7 @@ void init_string(){
 
 void transport_task(){
 	u8 Sta;
+	int i = 0;
 	while(1){
 		init_string();
 		nRF_RX_Mode();
@@ -62,8 +67,14 @@ void transport_task(){
 		if(Sta == RX_DR){
 			printf("I've received %s\n", rec_word);
 			check_status();
+			i = 0;
 		}else{
 			printf("Error\n");
+			i++;
+		}
+		if(i >= 3){
+			printf("Connection failure!!\n");
+			status = STOP;
 		}
 	}
 }

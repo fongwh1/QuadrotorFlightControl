@@ -3,7 +3,7 @@
 #include "stm32f4_delay.h"
 #include "string-util.h"
 #include "pwm.h"
-
+#include "transport.h"
 
 extern char status;
 
@@ -18,7 +18,7 @@ void PWM_print()
 
 void PWM_all_motor_pulse(int pulse){
 
-	if(pulse <= 1900 && pulse >800)
+	if(pulse <= 1900 && pulse > 700)
 	{
 		PWM_Motor1 = pulse;
 		Delay_100us(5);
@@ -100,5 +100,20 @@ void PWM_task(void * pvParameters)
 */
 
 
-	while(1);
+	int pwm_pulse;
+	status = STOP;
+	while(1){
+		pwm_pulse = PWM_Motor1;
+		if(status == STOP && pwm_pulse > 800){
+			//PWM_stop();
+			pwm_pulse -= 15;
+			PWM_all_motor_pulse(pwm_pulse);
+			PWM_print();
+		}else if(status == START && pwm_pulse <= 1500){
+			pwm_pulse += 20;
+			PWM_all_motor_pulse(pwm_pulse);
+			PWM_print();
+			//PWM_start();
+		}
+	}
 }
